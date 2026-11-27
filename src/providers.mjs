@@ -16,7 +16,34 @@ export function createFixtureProvider() {
     name: 'fixture/deterministic-v1',
     mode: 'selftest',
     reportsUsage: true,
-    async complete({ context, contextKind }) {
+    async complete({ context, contextKind, armName }) {
+      if (armName === 'ui-sdk:agent-bridge-query' && contextKind === 'component-snapshot') {
+        return {
+          usage: { promptTokens: 310, completionTokens: 50 },
+          call: { tool: 'query', input: { text: 'LI-9914' } },
+        }
+      }
+      if (contextKind === 'component-query') {
+        let items = []
+        try { items = JSON.parse(context) } catch { items = [] }
+        const row = items.find((c) => c.label === `tax-rate-${TARGET.id}`)
+        const status = items.find((c) => c.label === 'status')
+        if (status) {
+          return {
+            usage: { promptTokens: 190, completionTokens: 35 },
+            call: { tool: 'act', steps: [{ ref: 'Submit reconciliation', action: 'press' }] },
+          }
+        }
+        if (row) {
+          return {
+            usage: { promptTokens: 200, completionTokens: 55 },
+            call: {
+              tool: 'act',
+              steps: [{ ref: `tax-rate-${TARGET.id}`, action: 'setValue', args: ['0.0825'] }],
+            },
+          }
+        }
+      }
       const applied = correctionApplied(context, contextKind)
       if (contextKind === 'contract-state') {
         return applied

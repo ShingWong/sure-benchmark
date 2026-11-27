@@ -13,6 +13,7 @@
  *     --provider=$PWD/providers/my-provider.mjs --trials=3
  */
 import { LLMProviderFactory } from '@shing.wong/sure-gentic'
+import { buildSystemPrompt } from './tool-contracts.mjs'
 
 export function createProvider() {
   const factory = LLMProviderFactory.getInstance()
@@ -31,15 +32,10 @@ export function createProvider() {
     name: `sure-gentic:${llm.name}:${model}`,
     mode: 'measured',
     reportsUsage: true,
-    async complete({ prompt, context, contextKind }) {
+    async complete({ prompt, context, contextKind, armName }) {
       const response = await llm.complete(
         [
-          {
-            role: 'system',
-            content:
-              `${prompt}\n\nReply with JSON only, shaped as {"call": <arm call>}. ` +
-              'No prose, no markdown fences.',
-          },
+          { role: 'system', content: buildSystemPrompt({ prompt, armName }) },
           { role: 'user', content: `${contextKind}:\n${context}` },
         ],
         { model, temperature: 0 },

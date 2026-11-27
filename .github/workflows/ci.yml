@@ -37,7 +37,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Start local benchmark server
         run: node arms/server.mjs &
-      - name: End-to-end self-test of all three arms
+      - name: End-to-end self-test of all four arms
         run: npm run selftest -- --arm=all --trials=1
       - name: Real sure-state adapter self-test
         run: npm run selftest -- --arm=sure-state --adapter=sure-state --trials=1

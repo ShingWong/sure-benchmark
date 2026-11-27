@@ -36,6 +36,10 @@ export function summarise(report) {
       toolCalls: { median: median(nums('toolCalls')), range: spread(nums('toolCalls')) },
       contextChars: { median: median(nums('contextChars')), range: spread(nums('contextChars')) },
       durationMs: { median: median(nums('durationMs')), range: spread(nums('durationMs')) },
+      providerLatencyMs: {
+        median: median(nums('providerLatencyMs')),
+        range: spread(nums('providerLatencyMs')),
+      },
       promptTokens: tokens.length
         ? { median: median(tokens), range: spread(tokens) }
         : { median: null, range: [null, null] },
@@ -76,12 +80,12 @@ export function renderMarkdown(report, summary = summarise(report)) {
   lines.push(`- Pins sha256: \`${report.pinsDigest?.slice(0, 12)}\``)
   lines.push(`- Trials declared per arm: ${report.trialsDeclared}`)
   lines.push('')
-  lines.push('| Arm | Correct | Turns (median [min,max]) | Tool calls | Context chars | Wall clock ms | Prompt tokens | Errors |')
-  lines.push('|---|---|---|---|---|---|---|---|')
+  lines.push('| Arm | Correct | Turns (median [min,max]) | Tool calls | Context chars | Wall clock ms | Provider latency ms | Prompt tokens | Errors |')
+  lines.push('|---|---|---|---|---|---|---|---|---|')
   for (const [arm, s] of Object.entries(summary)) {
     const fmt = (v) => v.median == null ? 'not reported' : `${v.median} [${v.range[0]},${v.range[1]}]`
     lines.push(
-      `| ${arm} | ${s.passed}/${s.trials} | ${fmt(s.turns)} | ${fmt(s.toolCalls)} | ${fmt(s.contextChars)} | ${fmt(s.durationMs)} | ${fmt(s.promptTokens)} | ${s.errors} |`,
+      `| ${arm} | ${s.passed}/${s.trials} | ${fmt(s.turns)} | ${fmt(s.toolCalls)} | ${fmt(s.contextChars)} | ${fmt(s.durationMs)} | ${fmt(s.providerLatencyMs)} | ${fmt(s.promptTokens)} | ${s.errors} |`,
     )
   }
   lines.push('')
@@ -89,7 +93,8 @@ export function renderMarkdown(report, summary = summarise(report)) {
   lines.push('')
   lines.push('- All arms use the same fixture, prompt, shared verifier and seeded fault.')
   lines.push('- Arm C enforces the version fence **server-side**; Arms A/B enforce the equivalent rule in app code. This asymmetry is deliberate and disclosed, not hidden.')
-  lines.push('- `not reported` means the provider did not report usage. No value was estimated.')
+  lines.push('- `not reported` means the provider did not report a value. No value was estimated.')
+  lines.push('- Provider latency is measured around the model call only; wall clock includes arm setup and browser work. Do not conflate the two.')
   lines.push('- Context characters are recorded for comparability with third-party figures quoted in the design document; they are not tokens.')
   lines.push('- A trial counts as correct only if every shared check passes. Failed trials are retained and counted.')
   return lines.join('\n') + '\n'

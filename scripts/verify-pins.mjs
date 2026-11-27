@@ -15,7 +15,7 @@ const manifests = [
 let failures = 0
 console.log('Checking exact-version pins for reproducibility...')
 for (const [name, pin] of Object.entries(pins.packages)) {
-  if (pin.kind === 'python' || name === 'node') continue
+  if (pin.kind === 'python' || pin.kind === 'model' || name === 'node') continue
 
   const declaredIn = manifests.find((m) => {
     const d = m.json.dependencies?.[name] ?? m.json.optionalDependencies?.[name] ?? m.json.devDependencies?.[name]

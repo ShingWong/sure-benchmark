@@ -39,7 +39,7 @@ const maxTurns = Number(argv['max-turns'] ?? 10)
 if (!Number.isInteger(trials) || trials < 1) throw new Error('--trials must be a positive integer')
 
 const requested = String(argv.arm ?? 'contract').split(',')
-const names = requested.includes('all') ? ['contract', 'dom', 'ui-sdk'] : requested
+const names = requested.includes('all') ? ['contract', 'dom', 'ui-sdk', 'ui-sdk-query'] : requested
 const pinsPath = new URL('../pins.json', import.meta.url)
 const meta = {
   trials,
@@ -53,12 +53,16 @@ const armFactories = names.map((name) => async () => {
     if (name === 'sure-state' || adapter === 'sure-state') return createSureStateArm(fresh)
     return createContractArm(createReferenceStateMachine(fresh))
   }
-  if (name === 'dom' || name === 'ui-sdk') {
+  if (name === 'dom' || name === 'ui-sdk' || name === 'ui-sdk-query') {
     try {
-      const mod = await import(
-        name === 'dom' ? '../arms/dom/driver.mjs' : '../arms/ui-sdk/driver.mjs'
-      )
-      return name === 'dom' ? await mod.createDomArm() : await mod.createUiSdkArm()
+      const path =
+        name === 'dom' ? '../arms/dom/driver.mjs'
+          : name === 'ui-sdk' ? '../arms/ui-sdk/driver.mjs'
+            : '../arms/ui-sdk/query-driver.mjs'
+      const mod = await import(path)
+      return name === 'dom' ? await mod.createDomArm()
+        : name === 'ui-sdk' ? await mod.createUiSdkArm()
+          : await mod.createUiSdkQueryArm()
     } catch (err) {
       return createStubArm(name, `${err.message}. Build the arm and start arms/server.mjs first (arms/README.md).`)
     }

@@ -101,6 +101,31 @@ test('stub arms fail the shared verifier instead of being silently skipped', asy
   assert.equal(result.committed, false)
 })
 
+test('fixture provider drives the query-first bridge with read/act calls', async () => {
+  const provider = createFixtureProvider()
+  const full = await provider.complete({
+    context: '[{"label":"tax-rate-LI-9914","value":"0"}]',
+    contextKind: 'component-snapshot',
+    armName: 'ui-sdk:agent-bridge-query',
+  })
+  assert.deepEqual(full.call, { tool: 'query', input: { text: 'LI-9914' } })
+
+  const row = await provider.complete({
+    context: '[{"label":"tax-rate-LI-9914","value":"0"}]',
+    contextKind: 'component-query',
+    armName: 'ui-sdk:agent-bridge-query',
+  })
+  assert.equal(row.call.tool, 'act')
+  assert.equal(row.call.steps[0].action, 'setValue')
+
+  const status = await provider.complete({
+    context: '[{"label":"status","value":"PENDING"}]',
+    contextKind: 'component-query',
+    armName: 'ui-sdk:agent-bridge-query',
+  })
+  assert.equal(status.call.steps[0].action, 'press')
+})
+
 test('version fence rejects a stale write', async () => {
   const sm = createReferenceStateMachine(structuredClone(invoice))
   await assert.rejects(() => sm.updateField('LI-9914', 'tax_rate', 0.0825, invoice.version - 1), /CONCURRENCY_ERROR/)

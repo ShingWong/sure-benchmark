@@ -48,6 +48,8 @@ src/sure-state-adapter.mjs real sure-state, version fences via versionWhere/Conf
 arms/README.md             equivalence contract — read this before trusting a comparison
 arms/dom/                  Arm A: neutral React table + Playwright ariaSnapshot driver
 arms/ui-sdk/               Arm B: @ui-sdk/react@0.1.0-beta.1 bridge screen + driver
+arms/ui-sdk/query-driver.mjs  Arm B2: same screen, query()-based reads (anti-strawman)
+providers/gemini.mjs       real measured provider: Gemini REST with actual token usage
 arms/server.mjs            shared HTTP API, per-session state, same version fence
 providers/                 measured-provider template (no credentials in repo)
 ```
@@ -70,11 +72,18 @@ npm run selftest -- --arm=sure-state --adapter=sure-state   # real sure-state ad
 A measured run needs a real provider:
 
 ```bash
-cp providers/sure-gentic.example.mjs providers/my-provider.mjs
-# pin BENCH_MODEL, set one provider key, adapt the response parser
+export GEMINI_API_KEY=...                       # or GOOGLE_API_KEY; never commit
+export BENCH_MODEL=gemini-2.5-flash-lite        # pinned in providers/gemini.mjs
 npm run bench -- --mode=measured --arm=all --adapter=sure-state \
-  --provider="$PWD/providers/my-provider.mjs" --trials=3
+  --provider="$PWD/providers/gemini.mjs" --trials=3
 ```
+
+`providers/gemini.mjs` calls Google AI Studio REST directly because
+sure-gentic's `GoogleAIStudioProvider.complete()` does **not** return
+`usageMetadata`; the direct adapter records real prompt/completion tokens and
+per-call latency. `providers/sure-gentic.example.mjs` remains as a template for
+other vendors. Both receive the arm name from the harness so each arm gets the
+correct tool contract in its system prompt.
 
 `--trials` is declared before the run and appears in the result file. Results
 are written to `results/<mode>-<timestamp>.json` and `.md`.
@@ -108,6 +117,11 @@ are written to `results/<mode>-<timestamp>.json` and `.md`.
 - Arm B's screen is assembled from UI SDK behaviors. Its `snapshot()` lists
   only UI SDK components — we expose status as a UI SDK field so the final
   assertion reads the bridge, not a hidden DOM value.
+- **Arm B2 uses `query()` for targeted reads** after one orienting snapshot.
+  This is the bridge's own recommended tool and is included so we do not
+  compare against a deliberately wasteful bridge.
+- Provider latency (the model call only) is recorded separately from wall
+  clock (which includes browser setup). They are different numbers.
 - Arm C has no presentation layer. That is the independent variable.
 - Third-party figures are **characters read**, not tokens. We keep both
   columns, labelled, and never convert between them.

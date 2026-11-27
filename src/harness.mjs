@@ -26,6 +26,7 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
         prompt,
         context,
         contextKind: observation.contextKind,
+        armName: arm.name,
       })
       usage = mergeUsage(usage, response?.usage)
       const call = response?.call ?? null
@@ -35,6 +36,8 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
         contextKind: observation.contextKind,
         contextChars: context.length,
         call,
+        // Provider-reported latency, never inferred from wall-clock deltas.
+        providerLatencyMs: Number.isFinite(response?.latencyMs) ? response.latencyMs : null,
       })
       if (call) await arm.apply(call)
       if ((await arm.status()) === 'COMMITTED') {
@@ -54,6 +57,13 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
     error ??= { name: err?.name ?? 'Error', message: `result(): ${err?.message ?? String(err)}` }
   }
 
+  const latencies = trace.map((t) => t.providerLatencyMs).filter(Number.isFinite).sort((a, b) => a - b)
+  const providerLatencyMs = latencies.length
+    ? latencies.length % 2
+      ? latencies[(latencies.length - 1) / 2]
+      : (latencies[latencies.length / 2 - 1] + latencies[latencies.length / 2]) / 2
+    : null
+
   return {
     arm: arm.name,
     stub: Boolean(arm.stub),
@@ -62,6 +72,7 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
     turns,
     toolCalls,
     contextChars: trace.reduce((sum, t) => sum + t.contextChars, 0),
+    providerLatencyMs,
     usage: publicUsage(usage),
     durationMs: elapsedMs(started),
     stoppedBy,

@@ -41,7 +41,14 @@ arms/
   server.mjs        shared HTTP API + static host, per-session state, version fence
   dom/              Arm A: neutral React + Vite page, Playwright driver
   ui-sdk/           Arm B: @ui-sdk/react@0.1.0-beta.1 screen, bridge driver
+  ui-sdk/query-driver.mjs   Arm B2: same screen, agent uses query() instead of full snapshots
 ```
+
+**Arm B2 exists so the bridge comparison is not a strawman.** Its agent orients
+once with `snapshot()`, then reads individual components with `query()` and
+mutates through `act()`. It uses the same screen, fixture, prompt and verifier
+as Arm B; only the read strategy differs. Compare all four arms in the same
+measured run, never B against B2 across runs.
 
 ## Build and run
 
