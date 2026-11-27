@@ -1,5 +1,9 @@
 # Measured results — 2026-11-27
 
+> **Release candidate `v1.0.0` (not yet tagged).** These two runs and the
+> harness that produced them are the intended 1.0 content. The tag is cut only
+> after the sign-off checklist at the end of this document is complete.
+
 > **Scope:** one fictional task, four arms, 3 trials each, two separate pinned
 > models. These are real provider-reported measurements, but they are **not** a
 > general benchmark and must not be compared with figures from other workloads.
@@ -21,7 +25,7 @@
 | Trials declared | 3 per arm, before the run |
 | Raw result | `results/measured-2026-11-27T07-57-10-789Z.json` (local; gitignored) |
 
-## Results (median [min, max] over 3 trials)
+### Results (median [min, max] over 3 trials)
 
 | Arm | Correct | Turns | Context chars | Model ms/turn | **Arm mechanics ms** | Wall ms | Prompt tokens |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -34,7 +38,7 @@
 It is **not** wall clock minus model time. Model time is measured only around
 the provider call and includes network latency.
 
-## What the numbers actually say
+### What the numbers actually say
 
 1. **Against browser tools, the contract arm is clearly cheaper:** ~2.7× fewer
    context characters and ~2.6× fewer prompt tokens than the DOM arm, with 2
@@ -61,7 +65,7 @@ the provider call and includes network latency.
    *guarantee* (an agent cannot forge or race the version), but this workload
    did not stress it. Do not present it as a measured accuracy win.
 
-## Limitations — read before quoting
+### Limitations — read before quoting
 
 - One task, one model, 3 trials. Medians have no spread on deterministic
   payloads; no confidence interval is claimed.
@@ -73,11 +77,11 @@ the provider call and includes network latency.
 - The key was read from an ignored local file; no secret appears in any commit,
   result file or log.
 
-## Reproduce
+### Reproduce
 
-See `README.md` → "A measured run needs a real provider". Use the same pins and
-`--trials=3`; `assertComparable()` will refuse to mix this run with a different
-model, pins digest or fixture.
+See `README.md` → "Quick start" for the provider commands. Use the same pins
+and `--trials=3`; `assertComparable()` will refuse to mix this run with a
+different model, pins digest or fixture.
 
 ---
 
@@ -208,3 +212,18 @@ one task, three trials; no general accuracy claim.
 Different model family and a local server, so **no cross-run comparison with
 Run 1**. No internal host, path or credential is committed; the address and
 model id live only in environment variables. Medians over 3 trials only.
+
+---
+
+## 1.0 release sign-off checklist (pending)
+
+The tag `v1.0.0` must point to the commit that passes every item below.
+
+- [ ] Final read of `README.md` and `RESULTS.md` against the raw result JSONs: model ids, pins digests `bbb93c88…` / `2b018097…`, trial count and medians.
+- [ ] Confirm the four arms, the 0/3 failed attempt and the schema-honesty caveats are all disclosed, with no cross-run comparison.
+- [ ] Confirm no address, hostname, local path, credential or unrelated service appears in public source/docs.
+- [ ] Confirm `npm test` (10/10) and `npm run verify:pins` are green on the release commit.
+- [ ] Confirm CI and the pinned security gate are green, with private filter terms loaded.
+- [ ] Decide repository visibility, then create annotated tag `v1.0.0` on that commit.
+
+Until every box is checked, documents may say "release candidate" but not "released".

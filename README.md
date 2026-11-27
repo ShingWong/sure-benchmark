@@ -9,6 +9,11 @@
 > a fixture provider with hardcoded token counts — those exercise the plumbing
 > only and must never be quoted as measurements.
 
+> **Release candidate `v1.0.0` — awaiting final review.**
+> Scope: method, harness, four arms, two pinned measured runs. This is a
+> reproducible result set, not a universal leaderboard. The tag will be cut
+> only after the sign-off checklist in [`RESULTS.md`](RESULTS.md) is complete.
+
 This project asks a narrow question: for the **same** fictional billing
 reconciliation task, how much context does an agent have to read and how many
 actions does it need when its interface is (A) a conventional web page, (B) a
@@ -63,27 +68,30 @@ arms/README.md             equivalence contract — read this before trusting a 
 arms/dom/                  Arm A: neutral React table + Playwright ariaSnapshot driver
 arms/ui-sdk/               Arm B: @ui-sdk/react@0.1.0-beta.1 bridge screen + driver
 arms/ui-sdk/query-driver.mjs  Arm B2: same screen, query()-based reads (anti-strawman)
-providers/gemini.mjs       real measured provider: Gemini REST with actual token usage
 arms/server.mjs            shared HTTP API, per-session state, same version fence
-providers/                 measured-provider template (no credentials in repo)
+providers/tool-contracts.mjs  per-arm call shapes + stop condition, shared by adapters
+providers/gemini.mjs       Gemini REST, real token usage
+providers/openrouter.mjs   OpenRouter Sonnet-family run
+providers/llamacpp-local.mjs  local OpenAI-compatible run; address/model from env only
+providers/sure-gentic.example.mjs  template for other vendors (no credentials in repo)
 ```
 
 ## Quick start
 
 ```bash
 npm ci
-npm test                       # 8 hermetic tests, no browser needed
+npm test                       # 10 hermetic tests, no browser needed
 npm run verify:pins            # manifest and installed versions must match pins.json
 
 npm run selftest               # contract arm, fixture provider — plumbing check
 node arms/server.mjs &         # 127.0.0.1:4317 only
 (cd arms/dom && npm ci && npm run build)
 (cd arms/ui-sdk && npm ci && npm run build)
-npm run selftest -- --arm=all              # all three arms, still selftest
+npm run selftest -- --arm=all              # all four arms, still selftest
 npm run selftest -- --arm=sure-state --adapter=sure-state   # real sure-state adapter
 ```
 
-A measured run needs a real provider:
+Measured runs require a real provider and never use the fixture:
 
 ```bash
 export GEMINI_API_KEY=...                       # or GOOGLE_API_KEY; never commit
@@ -104,6 +112,16 @@ npm run bench -- --mode=measured --arm=all --adapter=sure-state \
 Vercel did **not** name the exact Sonnet version, so this is a pinned
 Sonnet-family model, not an exact-match claim. Our task is also smaller than
 their settings screen, so compare our four arms to each other only.
+
+For a local OpenAI-compatible llama.cpp server (no address or model id is
+committed):
+
+```bash
+export BENCH_BASE_URL=http://<host>:<port>/v1
+export BENCH_MODEL=<exact-id-from-v1-models>
+npm run bench -- --mode=measured --arm=all --adapter=sure-state \
+  --provider="$PWD/providers/llamacpp-local.mjs" --trials=3
+```
 
 `providers/gemini.mjs` calls Google AI Studio REST directly because
 sure-gentic's `GoogleAIStudioProvider.complete()` does **not** return
