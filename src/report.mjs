@@ -40,6 +40,10 @@ export function summarise(report) {
         median: median(nums('providerLatencyMs')),
         range: spread(nums('providerLatencyMs')),
       },
+      armMechanicsMs: {
+        median: median(nums('armMechanicsMs')),
+        range: spread(nums('armMechanicsMs')),
+      },
       promptTokens: tokens.length
         ? { median: median(tokens), range: spread(tokens) }
         : { median: null, range: [null, null] },
@@ -80,12 +84,12 @@ export function renderMarkdown(report, summary = summarise(report)) {
   lines.push(`- Pins sha256: \`${report.pinsDigest?.slice(0, 12)}\``)
   lines.push(`- Trials declared per arm: ${report.trialsDeclared}`)
   lines.push('')
-  lines.push('| Arm | Correct | Turns (median [min,max]) | Tool calls | Context chars | Wall clock ms | Provider latency ms | Prompt tokens | Errors |')
-  lines.push('|---|---|---|---|---|---|---|---|---|')
+  lines.push('| Arm | Correct | Turns | Tool calls | Context chars | Model ms/turn | Arm mechanics ms | Wall ms | Prompt tokens | Errors |')
+  lines.push('|---|---|---|---|---|---|---|---|---|---|')
   for (const [arm, s] of Object.entries(summary)) {
     const fmt = (v) => v.median == null ? 'not reported' : `${v.median} [${v.range[0]},${v.range[1]}]`
     lines.push(
-      `| ${arm} | ${s.passed}/${s.trials} | ${fmt(s.turns)} | ${fmt(s.toolCalls)} | ${fmt(s.contextChars)} | ${fmt(s.durationMs)} | ${fmt(s.providerLatencyMs)} | ${fmt(s.promptTokens)} | ${s.errors} |`,
+      `| ${arm} | ${s.passed}/${s.trials} | ${fmt(s.turns)} | ${fmt(s.toolCalls)} | ${fmt(s.contextChars)} | ${fmt(s.providerLatencyMs)} | ${fmt(s.armMechanicsMs)} | ${fmt(s.durationMs)} | ${fmt(s.promptTokens)} | ${s.errors} |`,
     )
   }
   lines.push('')
@@ -94,7 +98,8 @@ export function renderMarkdown(report, summary = summarise(report)) {
   lines.push('- All arms use the same fixture, prompt, shared verifier and seeded fault.')
   lines.push('- Arm C enforces the version fence **server-side**; Arms A/B enforce the equivalent rule in app code. This asymmetry is deliberate and disclosed, not hidden.')
   lines.push('- `not reported` means the provider did not report a value. No value was estimated.')
-  lines.push('- Provider latency is measured around the model call only; wall clock includes arm setup and browser work. Do not conflate the two.')
+  lines.push('- Model ms/turn is measured around the provider call only. Arm mechanics ms is timed directly around observe()/apply() — it is NOT wall minus model.')
+  lines.push('- Wall clock includes model calls, arm mechanics, browser setup and harness overhead. Model time dominates it; compare arms on arm mechanics when the question is interface cost.')
   lines.push('- Context characters are recorded for comparability with third-party figures quoted in the design document; they are not tokens.')
   lines.push('- A trial counts as correct only if every shared check passes. Failed trials are retained and counted.')
   return lines.join('\n') + '\n'

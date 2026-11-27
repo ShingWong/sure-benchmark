@@ -15,16 +15,20 @@
 | Prompt | `prompt.txt`, identical for all arms |
 | Success check | `src/verdict.mjs`, identical for all arms |
 | Trials declared | 3 per arm, before the run |
-| Raw result | `results/measured-2026-11-27T07-39-47-532Z.json` (local; gitignored) |
+| Raw result | `results/measured-2026-11-27T07-57-10-789Z.json` (local; gitignored) |
 
 ## Results (median [min, max] over 3 trials)
 
-| Arm | Correct | Turns | Tool calls | Context chars | Provider latency ms | Wall clock ms | Prompt tokens |
+| Arm | Correct | Turns | Context chars | Model ms/turn | **Arm mechanics ms** | Wall ms | Prompt tokens |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Contract (`sure-state`) | **3/3** | 2 [2,2] | 2 [2,2] | 4,843 [4,843,4,843] | 1,216 [1,197,1,234] | 2,439 [2,422,2,475] | 2,463 [2,463,2,463] |
-| DOM / aria snapshot | **3/3** | 2 [2,2] | 2 [2,2] | 13,198 [13,198,13,198] | 1,267 [1,230,1,339] | 2,828 [2,798,2,979] | 6,492 [6,492,6,492] |
-| UI SDK bridge (`snapshot`) | **3/3** | 2 [2,2] | 2 [2,2] | 4,701 [4,701,4,701] | 1,206 [1,169,1,228] | 2,691 [2,656,2,833] | **2,391 [2,391,2,391]** |
-| UI SDK bridge (`query`) | **3/3** | 4 [4,4] | 4 [4,4] | **2,664 [2,664,2,664]** | 1,276 [1,201,1,408] | 5,760 [5,378,5,999] | 2,574 [2,574,2,574] |
+| Contract (`sure-state`) | **3/3** | 2 | 4,843 | 1,218 [1,116,1,299] | **0.51 [0.48, 2.19]** | 2,446 [2,241,2,629] | 2,463 |
+| DOM / aria snapshot | **3/3** | 2 | 13,198 | 1,239 [1,186,1,314] | **251.76 [250.58, 290.03]** | 2,756 [2,654,2,958] | 6,492 |
+| UI SDK bridge (`snapshot`) | **3/3** | 2 | 4,701 | 1,312 [1,129,1,315] | **224.48 [194.02, 240.50]** | 2,860 [2,540,2,892] | **2,391** |
+| UI SDK bridge (`query`) | **3/3** | 4 | **2,664** | 1,333 [1,250,1,341] | **228.39 [227.32, 277.76]** | 5,522 [5,437,5,562] | 2,574 |
+
+**Arm mechanics** is timed directly around each `observe()` and `apply()` call.
+It is **not** wall clock minus model time. Model time is measured only around
+the provider call and includes network latency.
 
 ## What the numbers actually say
 
@@ -39,9 +43,15 @@
    needs 4 turns** and ends up slightly above the plain bridge in total tokens
    (2,574 vs 2,391) and more than 2× its wall clock. Less context per turn is
    not the same as less total context.
-4. **Model latency dominates.** Provider latency is ~1.2 s of roughly 2.4–2.8 s
-   wall clock for the 2-turn arms. Differences in dispatch mechanics are small
-   next to the model call, so this run cannot support "X ms dispatch" claims.
+4. **Model latency hides the architectural difference in wall clock.** It is
+   ~1.2–1.3 s of roughly 2.4–2.9 s wall clock for the 2-turn arms. That is why
+   we now time the arm side directly: the contract arm spends **0.51 ms** in
+   observe+apply per trial, versus **224 ms** for the component bridge and
+   **252 ms** for the DOM arm — roughly **400–500× less interface work**. This
+   is a real, measured difference, but it is *interface mechanics*, not a claim
+   about end-to-end speed: the model call dominates the user-visible latency
+   in every arm, and Arm C has no presentation layer by design. Report the two
+   columns together; do not quote one without the other.
 5. **All arms passed 3/3.** No correctness difference was demonstrated on this
    task. The contract arm's server-enforced version fence is a stronger
    *guarantee* (an agent cannot forge or race the version), but this workload

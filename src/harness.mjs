@@ -20,7 +20,9 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
 
   try {
     for (; turns < maxTurns; turns++) {
+      const observeStart = performance.now()
       const observation = await arm.observe()
+      const observeMs = +(performance.now() - observeStart).toFixed(2)
       const context = observation.context ?? ''
       const response = await provider.complete({
         prompt,
@@ -31,6 +33,9 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
       usage = mergeUsage(usage, response?.usage)
       const call = response?.call ?? null
       if (call) toolCalls += 1
+      const applyStart = performance.now()
+      if (call) await arm.apply(call)
+      const applyMs = +(performance.now() - applyStart).toFixed(2)
       trace.push({
         turn: turns + 1,
         contextKind: observation.contextKind,
@@ -38,8 +43,10 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
         call,
         // Provider-reported latency, never inferred from wall-clock deltas.
         providerLatencyMs: Number.isFinite(response?.latencyMs) ? response.latencyMs : null,
+        // Directly timed arm mechanics — no subtraction from wall clock.
+        observeMs,
+        applyMs,
       })
-      if (call) await arm.apply(call)
       if ((await arm.status()) === 'COMMITTED') {
         turns += 1
         stoppedBy = 'committed'
@@ -64,6 +71,10 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
       : (latencies[latencies.length / 2 - 1] + latencies[latencies.length / 2]) / 2
     : null
 
+  const armMechanicsMs = +trace
+    .reduce((sum, t) => sum + (t.observeMs ?? 0) + (t.applyMs ?? 0), 0)
+    .toFixed(2)
+
   return {
     arm: arm.name,
     stub: Boolean(arm.stub),
@@ -73,6 +84,7 @@ export async function runArm({ arm, provider, prompt, invoice, maxTurns = 10 }) 
     toolCalls,
     contextChars: trace.reduce((sum, t) => sum + t.contextChars, 0),
     providerLatencyMs,
+    armMechanicsMs,
     usage: publicUsage(usage),
     durationMs: elapsedMs(started),
     stoppedBy,

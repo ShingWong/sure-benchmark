@@ -45,6 +45,9 @@ test('harness accumulates only provider-reported token usage', async () => {
   assert.deepEqual(result.usage, { promptTokens: 850 + 920, completionTokens: 60 + 40 })
   assert.equal(result.stoppedBy, 'committed')
   assert.equal(result.contextChars > 0, true)
+  assert.equal(Number.isFinite(result.armMechanicsMs), true)
+  assert.equal(result.armMechanicsMs >= 0, true)
+  assert.equal(result.trace.every((t) => Number.isFinite(t.observeMs) && Number.isFinite(t.applyMs)), true)
 })
 
 test('missing usage stays missing — never estimated', async () => {
