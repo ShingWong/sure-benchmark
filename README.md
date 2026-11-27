@@ -2,10 +2,12 @@
 
 **Reproducible agent-architecture benchmark for the sure stack.**
 
-> **Status: scaffold with passing self-tests — no published results.**
-> All numbers currently in `results/` come from a fixture provider with
-> hardcoded token counts. They exercise the plumbing only. They are stamped
-> `mode: "selftest"` and must never be quoted as measurements.
+> **Status: measured — two 3-trial runs are published in [`RESULTS.md`](RESULTS.md).**
+> Run 1: hosted `anthropic/claude-sonnet-4.5`. Run 2: local
+> `QWEN3.8_27B_Q40`. Both record real provider token usage, latency, medians
+> and min/max. `results/` also contains earlier `mode: "selftest"` files from
+> a fixture provider with hardcoded token counts — those exercise the plumbing
+> only and must never be quoted as measurements.
 
 This project asks a narrow question: for the **same** fictional billing
 reconciliation task, how much context does an agent have to read and how many
@@ -177,13 +179,18 @@ Quoted as context only; none of these numbers are produced by this project.
 The full design document is in the private `sure-master` repo:
 `ui_sdk_vs_sure_stack.md` (sections 7–8).
 
-## Before publishing anything
+## Release checklist — satisfied
 
-- [ ] Add ≥N measured runs per arm with a pinned model id and a configured key.
-- [ ] Confirm medians and spread; do not quote single trials.
-- [ ] Record the provider version and model in each result file.
-- [ ] Review `arms/README.md` against the final result table.
-- [ ] Keep the fixture, prompt and pins unchanged between compared runs.
+- [x] Two measured runs, 3 trials per arm, with pinned model ids and configured keys.
+- [x] Medians with min/max in `RESULTS.md`; single-trial runs are labelled smoke tests and are not quoted.
+- [x] Provider name, model and pins digest recorded in each result file and in `RESULTS.md`.
+- [x] `arms/README.md` reviewed against both result tables; asymmetries and the failed 0/3 attempt are disclosed.
+- [x] Fixture, prompt and pins held constant **within each compared run**; `assertComparable()` refuses to mix runs with different providers, modes, fixtures or pins digests. The two published runs use different models and are never compared to each other.
+
+The project publishes a **method and a measured result set** for evaluating
+agentic interfaces against deterministic state contracts — not a universal
+leaderboard. Compare arms within a run, not across runs or against figures
+from other workloads.
 
 ## License
 

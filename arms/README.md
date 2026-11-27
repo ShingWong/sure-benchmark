@@ -87,3 +87,11 @@ interface as `src/arms.mjs`:
 
 `observe()` produces exactly the payload the agent sees. Nothing is filtered
 after the fact: the recorded `contextChars` is the length of that payload.
+
+## Results cross-reference
+
+Both published runs use all four arms defined here — `contract:sure-state`,
+`dom:react-aria-snapshot`, `ui-sdk:agent-bridge` and
+`ui-sdk:agent-bridge-query`. Their measured tables, the disclosed asymmetries
+above, and the retained 0/3 UI SDK failure are in [`RESULTS.md`](../RESULTS.md).
+No arm-specific success criterion exists outside `src/verdict.mjs`.
