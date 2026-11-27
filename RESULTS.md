@@ -127,6 +127,42 @@ model, pins digest or fixture.
   are retained in `results/`; the screen and tool contract were then fixed and
   the whole set rerun.
 
+### Schema honesty: the `taxable` failure
+
+The first local run (retained at
+`results/measured-2026-11-27T08-03-45-634Z.json`) failed Arm B 0/3. Its trace
+shows the model treating every zero tax rate as the seeded fault:
+
+```
+LI-9914  tax_rate 0.0825   ← intended correction
+LI-9906  tax_rate 0.0825   ← non-taxable, legitimate zero
+LI-9916  tax_rate 0.0825   ← non-taxable, legitimate zero
+```
+
+The shared verifier caught it: `no_collateral_changes` failed (three rows
+changed instead of one) and `version_advanced` failed (107 vs 105). The
+contract arm did not make this mistake: its context is the typed entity state,
+where every row carries `taxable: true|false` alongside `tax_rate`. The
+component bridge's `snapshot()` listed labels, values and actions — control
+state — but the fact needed to disambiguate the task, `taxable`, existed only
+in the app and was not in the agent's context. The agent therefore reasoned
+from a presentation heuristic ("zero means broken") instead of the domain
+schema.
+
+We fixed the screen by adding `taxable-<id>` fields to the bridge, disclosed
+that change, and reran. That is itself the point: **a component bridge can
+carry the fact, but only if the app author remembers to surface it; a contract
+state machine exposes the typed domain model by construction.** This is a
+schema-honesty advantage — the agent sees what the data *is*, not what the UI
+happens to render — and it showed up as a correctness failure, not a token
+difference.
+
+**Caveats, required when quoting this:** it is one model, one task, three
+trials; the bridge could expose the same field from the start (ours initially
+did not); and the contract arm has no presentation layer by design. This is a
+demonstrated failure mode and a structural argument, **not** a general accuracy
+claim.
+
 ### Limits
 
 Different model family and a local server, so **no cross-run comparison with

@@ -129,6 +129,20 @@ test('fixture provider drives the query-first bridge with read/act calls', async
   assert.equal(status.call.steps[0].action, 'press')
 })
 
+test('contract context exposes domain fields the first bridge screen omitted', async () => {
+  const { context, contextKind } = await freshArm().observe()
+  assert.equal(contextKind, 'contract-state')
+  const state = JSON.parse(context)
+  assert.ok(state.line_items.length === 20)
+  assert.ok(
+    state.line_items.every(
+      (item) => typeof item.taxable === 'boolean' && typeof item.tax_rate === 'number',
+    ),
+  )
+  // The agent can distinguish a taxable zero from a legitimate non-taxable
+  // zero directly from the typed state, without relying on presentation hints.
+})
+
 test('version fence rejects a stale write', async () => {
   const sm = createReferenceStateMachine(structuredClone(invoice))
   await assert.rejects(() => sm.updateField('LI-9914', 'tax_rate', 0.0825, invoice.version - 1), /CONCURRENCY_ERROR/)

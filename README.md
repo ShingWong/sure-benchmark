@@ -133,6 +133,11 @@ are written to `results/<mode>-<timestamp>.json` and `.md`.
 - **Arm B2 uses `query()` for targeted reads** after one orienting snapshot.
   This is the bridge's own recommended tool and is included so we do not
   compare against a deliberately wasteful bridge.
+- **Schema honesty was tested, not asserted.** The first local run failed Arm B
+  because the bridge snapshot exposed control values but not the `taxable`
+  domain fact, so the agent "fixed" two legitimate non-taxable zero rows. The
+  contract arm's typed state exposed `taxable` directly. See `RESULTS.md` §
+  "Schema honesty" for the trace and the required caveats.
 - Provider latency (the model call only) is recorded separately from wall
   clock (which includes browser setup). They are different numbers.
 - Arm C has no presentation layer. That is the independent variable.
