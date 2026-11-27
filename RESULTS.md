@@ -95,6 +95,25 @@ model, pins digest or fixture.
 | Trials declared | 3 per arm |
 | Raw result | `results/measured-2026-11-27T08-08-24-118Z.json` (local; gitignored) |
 
+### Sanitized host profile
+
+Published for reproducibility only. No address, hostname, local path or
+unrelated service is included; the exact values are kept in a private record.
+
+| Item | Value |
+|---|---|
+| Host class | x86_64 Debian 13, dual-socket Xeon E5-2698 v4 (70 logical CPUs), 64 GiB RAM |
+| Accelerator | one AMD Radeon Instinct MI50 32 GB (`gfx906`, ROCm/HIP), ~32 GiB VRAM |
+| Runtime | llama.cpp `1.0.0-dev`, build `12738`, commit `48ac73696`, HIP build, Clang 17 |
+| Model | `Qwen3.8-27B-Q4_0.gguf`, 27.32 B params, Q4_0, 15.7 GB, 32 K context |
+| Serve flags | `-t 32`, `-ngl all`, `--jinja`, `-fa on`, `-ctk q8_0`, `-ctv q8_0`, `-c 32768`, `-np 1`, `-ub 2048` |
+| Speculative decoding | `draft-mtp`, draft model `Qwen3.8-FastMTP-32K.gguf`, n-max 2 |
+| Multimodal projector | loaded but unused — this benchmark is text-only |
+
+Observed probe throughput was ~259 tok/s prompt evaluation and ~26–39 tok/s
+generation. These are run observations, not a hardware guarantee; the measured
+arm results above are the authoritative numbers.
+
 ### Results (median [min, max] over 3 trials)
 
 | Arm | Correct | Turns | Context chars | Model ms/turn | Arm mechanics ms | Wall ms | Prompt tokens |

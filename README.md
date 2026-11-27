@@ -33,9 +33,21 @@ verifier**, and we state the differences plainly.
 ## What is not measured
 
 - Nothing in `mode: "selftest"` is a measurement.
-- No latency number is attributed to "dispatch" or "LLM" separately unless a
-  provider records it; the harness reports whole-arm wall clock only.
+- No "dispatch latency" claim: arm mechanics and model latency are timed
+  separately, but end-to-end speed is still dominated by the model.
 - The cited third-party figures (§Sources) are **not** our results.
+
+## Measured environments
+
+| Run | Provider | Sanitized environment |
+|---|---|---|
+| 1 | OpenRouter, `anthropic/claude-sonnet-4.5` | hosted model; exact id and pins digest in `RESULTS.md` |
+| 2 | Local llama.cpp HTTP API | dual-socket Xeon E5-2698 v4, 64 GiB RAM, one AMD Instinct MI50 32 GB (ROCm/HIP), llama.cpp `1.0.0-dev`, `Qwen3.8-27B-Q4_0` at Q4_0 / 32 K context, flash attention and speculative draft |
+
+No internal address, hostname, filesystem path or credential is published.
+The full host inventory stays in a private record; `RESULTS.md` §Run 2 has the
+sanitized flags and the complete measured table. The two runs use different
+models and are never compared to each other.
 
 ## Layout
 
