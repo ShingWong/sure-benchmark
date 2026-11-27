@@ -73,6 +73,12 @@
       "kind": "model",
       "source": "https://openrouter.ai/models/anthropic/claude-sonnet-4.5",
       "note": "Vercel reported 'Sonnet via Claude Code' without naming a version. This is our pinned Sonnet-family model, not an exact-match claim."
+    },
+    "QWEN3.8_27B_Q40": {
+      "version": "QWEN3.8_27B_Q40",
+      "kind": "model",
+      "source": "local llama.cpp server",
+      "note": "Address and exact server model id are supplied by BENCH_BASE_URL / BENCH_MODEL at run time; no internal host or path is committed."
     }
   },
   "sources": [

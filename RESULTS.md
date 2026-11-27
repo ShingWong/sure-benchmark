@@ -1,10 +1,14 @@
 # Measured results — 2026-11-27
 
-> **Scope:** one fictional task, four arms, 3 trials each, one pinned model.
-> These are real provider-reported measurements, but they are **not** a general
-> benchmark and must not be compared with figures from other workloads.
+> **Scope:** one fictional task, four arms, 3 trials each, two separate pinned
+> models. These are real provider-reported measurements, but they are **not** a
+> general benchmark and must not be compared with figures from other workloads.
+> Run 1 (Sonnet) and Run 2 (local Qwen) use different models — compare arms
+> **within** a run, never across runs.
 
-## Run identity
+## Run 1 — hosted Sonnet
+
+### Run identity
 
 | Field | Value |
 |---|---|
@@ -74,3 +78,57 @@ the provider call and includes network latency.
 See `README.md` → "A measured run needs a real provider". Use the same pins and
 `--trials=3`; `assertComparable()` will refuse to mix this run with a different
 model, pins digest or fixture.
+
+---
+
+## Run 2 — local Qwen3.8-27B-Q4_0
+
+### Run identity
+
+| Field | Value |
+|---|---|
+| Provider | `llamacpp:Qwen3.8-27B-Q4_0.gguf` (OpenAI-compatible local server) |
+| Model pin | `QWEN3.8_27B_Q40`; exact server id supplied by `BENCH_MODEL` at run time |
+| Address | supplied by `BENCH_BASE_URL` at run time — **not stored in this repo** |
+| Pins SHA-256 | `2b018097df26…` |
+| Prompt / fixture / verifier | identical to Run 1 |
+| Trials declared | 3 per arm |
+| Raw result | `results/measured-2026-11-27T08-08-24-118Z.json` (local; gitignored) |
+
+### Results (median [min, max] over 3 trials)
+
+| Arm | Correct | Turns | Context chars | Model ms/turn | Arm mechanics ms | Wall ms | Prompt tokens |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Contract (`sure-state`) | **3/3** | 2 | 4,843 | 1,207 [1,143,1,288] | **0.65 [0.38, 1.68]** | **2,417 [2,297,2,579]** | 2,571 |
+| DOM / aria snapshot | **3/3** | 2 | 13,198 | 9,819 [7,773,10,294] | 272.49 [258.10,310.49] | 19,918 [15,887,20,884] | 6,756 |
+| UI SDK bridge (`snapshot`) | **3/3** | 2 | 8,945 | 8,632 [7,256,8,761] | 260.80 [224.86,272.50] | 17,542 [14,839,17,844] | 3,699 |
+| UI SDK bridge (`query`) | **3/3** | 6 | 5,212 | 1,367 [1,343,1,375] | 352.04 [350.81,356.69] | 9,152 [8,950,16,033] | 4,369 |
+
+### What changed versus Run 1
+
+- **End-to-end latency now follows context size.** The local model's prompt
+  evaluation cost scales with the payload: the contract arm's ~1.2 s model
+  turn (4,843 chars) versus ~8–10 s for DOM (13,198 chars) and the bridge
+  (8,945 chars). That makes the contract arm **~7–8× faster in wall clock**
+  than either browser arm — an advantage the hosted model's flat ~1.2 s/turn
+  had masked.
+- **On tokens the contract arm did beat the bridge here (2,571 vs 3,699),
+  unlike Run 1** — but the gap comes mostly from the extra `taxable-<id>`
+  fields we had to expose on the bridge screen (8,945 chars) after the first
+  local attempt misread non-taxable rows. That screen change is disclosed; it
+  was needed for a fair task, so do not present the token gap as intrinsic.
+- **The `query()` bridge regressed on this model:** 6 turns, 5,212 chars,
+  4,369 tokens, 9,152 ms — worse than the plain bridge on every total metric.
+  A targeted read strategy is not automatically cheaper.
+- **Arm mechanics stayed ~0.65 ms vs ~260–272 ms** for the browser arms, same
+  as Run 1 — about 400× less interface work.
+- **First attempt failed honestly:** the local model changed two non-taxable
+  rows because the bridge snapshot did not expose `taxable`. Those 0/3 trials
+  are retained in `results/`; the screen and tool contract were then fixed and
+  the whole set rerun.
+
+### Limits
+
+Different model family and a local server, so **no cross-run comparison with
+Run 1**. No internal host, path or credential is committed; the address and
+model id live only in environment variables. Medians over 3 trials only.

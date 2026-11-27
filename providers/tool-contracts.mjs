@@ -10,9 +10,9 @@ export const TOOL_CONTRACT = {
   'dom:react-aria-snapshot':
     'The context is an ARIA snapshot. Each row shows its tax rate as TEXT (tax-rate-value-<id>) and as a spinbutton. Look at the row for LI-9914. If its tax rate text is "0", fill its spinbutton: {"call":{"type":"fill","selector":"[aria-label=\\"tax-rate-LI-9914\\"]","value":"0.0825"}}. If its tax rate text is already "0.0825", IMMEDIATELY click submit: {"call":{"type":"click","selector":"#submit-btn"}}. Ignore other rows — non-taxable rows legitimately show 0.',
   'ui-sdk:agent-bridge':
-    'The context is a component snapshot. If a taxable row still has value "0", set it: {"call":{"steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}],"intent":"update"}}. If no taxable row has value "0", press submit: {"call":{"steps":[{"ref":"Submit reconciliation","action":"press"}],"intent":"submit"}}.',
+    'The context is a component snapshot. Each row has field taxable-<id> with value "true" or "false". Only a row whose taxable-<id> is "true" AND whose tax-rate-<id> value is "0" needs correction. Do NOT change rows with taxable value "false". Set the faulty row with {"call":{"steps":[{"ref":"tax-rate-<that id>","action":"setValue","args":["0.0825"]}],"intent":"update"}}. When no taxable row has value "0", press submit: {"call":{"steps":[{"ref":"Submit reconciliation","action":"press"}],"intent":"submit"}}.',
   'ui-sdk:agent-bridge-query':
-    'First use {"call":{"tool":"query","input":{"text":"<row id>"}}}. If the returned row still has value "0", use {"call":{"tool":"act","steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}]}}. When no taxable row has value "0", use {"call":{"tool":"act","steps":[{"ref":"Submit reconciliation","action":"press"}]}}.',
+    'First use {"call":{"tool":"query","input":{"text":"taxable-LI-9914"}}} and {"call":{"tool":"query","input":{"text":"LI-9914"}}} to read that row. Only rows whose taxable-<id> field is "true" and tax rate is "0" need correction; do not change rows with taxable value "false". Use {"call":{"tool":"act","steps":[{"ref":"tax-rate-<that id>","action":"setValue","args":["0.0825"]}]}}. When no taxable row has value "0", use {"call":{"tool":"act","steps":[{"ref":"Submit reconciliation","action":"press"}]}}.',
 }
 
 /**

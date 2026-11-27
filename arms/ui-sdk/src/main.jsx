@@ -62,13 +62,21 @@ function App() {
     <div id="reconciliation-root">
       <h1>Reconciliation: {state.customer_id}</h1>
       {state.line_items.map((item) => (
-        <Field key={item.id} name={`tax-${item.id}`}>
-          <FieldLabel>{`tax-rate-${item.id}`}</FieldLabel>
-          <FieldControl render={
-            <Input value={String(item.tax_rate)}
-              onValueChange={(value) => changeTax(item.id, value)} />
-          } />
-        </Field>
+        <React.Fragment key={item.id}>
+          <Field name={`tax-${item.id}`}>
+            <FieldLabel>{`tax-rate-${item.id}`}</FieldLabel>
+            <FieldControl render={
+              <Input value={String(item.tax_rate)}
+                onValueChange={(value) => changeTax(item.id, value)} />
+            } />
+          </Field>
+          {/* Expose the taxable flag to the bridge so an agent can tell a
+              seeded fault from a legitimately zero non-taxable row. */}
+          <Field name={`taxable-${item.id}`}>
+            <FieldLabel>{`taxable-${item.id}`}</FieldLabel>
+            <FieldControl render={<Input value={String(item.taxable)} readOnly />} />
+          </Field>
+        </React.Fragment>
       ))}
       <Field name="status">
         <FieldLabel>status</FieldLabel>
