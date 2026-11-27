@@ -78,6 +78,19 @@ npm run bench -- --mode=measured --arm=all --adapter=sure-state \
   --provider="$PWD/providers/gemini.mjs" --trials=3
 ```
 
+For the Sonnet-family run comparable in shape to the published Vercel work:
+
+```bash
+export OPENROUTER_API_KEY=...                       # never commit
+export BENCH_MODEL=anthropic/claude-sonnet-4.5      # pinned in pins.json
+npm run bench -- --mode=measured --arm=all --adapter=sure-state \
+  --provider="$PWD/providers/openrouter.mjs" --trials=3
+```
+
+Vercel did **not** name the exact Sonnet version, so this is a pinned
+Sonnet-family model, not an exact-match claim. Our task is also smaller than
+their settings screen, so compare our four arms to each other only.
+
 `providers/gemini.mjs` calls Google AI Studio REST directly because
 sure-gentic's `GoogleAIStudioProvider.complete()` does **not** return
 `usageMetadata`; the direct adapter records real prompt/completion tokens and

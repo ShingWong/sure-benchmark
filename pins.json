@@ -67,6 +67,12 @@
       "version": "gemini-2.5-flash-lite",
       "kind": "model",
       "source": "https://ai.google.dev/gemini-api/docs/models"
+    },
+    "anthropic/claude-sonnet-4.5": {
+      "version": "anthropic/claude-sonnet-4.5",
+      "kind": "model",
+      "source": "https://openrouter.ai/models/anthropic/claude-sonnet-4.5",
+      "note": "Vercel reported 'Sonnet via Claude Code' without naming a version. This is our pinned Sonnet-family model, not an exact-match claim."
     }
   },
   "sources": [
