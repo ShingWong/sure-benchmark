@@ -9,10 +9,10 @@
 > a fixture provider with hardcoded token counts — those exercise the plumbing
 > only and must never be quoted as measurements.
 
-> **Release candidate `v1.0.0` — awaiting final review.**
+> **Released `v1.0.0` — 2026-11-27.**
 > Scope: method, harness, four arms, two pinned measured runs. This is a
-> reproducible result set, not a universal leaderboard. The tag will be cut
-> only after the sign-off checklist in [`RESULTS.md`](RESULTS.md) is complete.
+> reproducible result set, not a universal leaderboard. Final sign-off and
+> evidence are recorded in [`RESULTS.md`](RESULTS.md).
 
 This project asks a narrow question: for the **same** fictional billing
 reconciliation task, how much context does an agent have to read and how many

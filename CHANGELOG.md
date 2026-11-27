@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (release candidate — pending final review)
+## 1.0.0 (2026-11-27)
 
 First release candidate. Contains the complete reproducible benchmark, not a
 universal leaderboard.

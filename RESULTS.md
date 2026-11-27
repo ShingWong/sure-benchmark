@@ -1,8 +1,8 @@
 # Measured results — 2026-11-27
 
-> **Release candidate `v1.0.0` (not yet tagged).** These two runs and the
-> harness that produced them are the intended 1.0 content. The tag is cut only
-> after the sign-off checklist at the end of this document is complete.
+> **Released `v1.0.0` (tag `v1.0.0`, 2026-11-27).** These two runs and the
+> harness that produced them are the released 1.0 content. The completed
+> sign-off checklist is at the end of this document.
 
 > **Scope:** one fictional task, four arms, 3 trials each, two separate pinned
 > models. These are real provider-reported measurements, but they are **not** a
@@ -215,15 +215,13 @@ model id live only in environment variables. Medians over 3 trials only.
 
 ---
 
-## 1.0 release sign-off checklist (pending)
+## 1.0 release sign-off (completed 2026-11-27)
 
-The tag `v1.0.0` must point to the commit that passes every item below.
+The annotated tag `v1.0.0` points to the commit that passes every item below.
 
-- [ ] Final read of `README.md` and `RESULTS.md` against the raw result JSONs: model ids, pins digests `bbb93c88…` / `2b018097…`, trial count and medians.
-- [ ] Confirm the four arms, the 0/3 failed attempt and the schema-honesty caveats are all disclosed, with no cross-run comparison.
-- [ ] Confirm no address, hostname, local path, credential or unrelated service appears in public source/docs.
-- [ ] Confirm `npm test` (10/10) and `npm run verify:pins` are green on the release commit.
-- [ ] Confirm CI and the pinned security gate are green, with private filter terms loaded.
-- [ ] Decide repository visibility, then create annotated tag `v1.0.0` on that commit.
-
-Until every box is checked, documents may say "release candidate" but not "released".
+- [x] Final read of `README.md` and `RESULTS.md` against the raw result JSONs: model ids, pins digests `bbb93c88…` / `2b018097…`, trial count and medians.
+- [x] Four arms, the retained 0/3 failed attempt and the schema-honesty caveats are disclosed, with no cross-run comparison.
+- [x] No address, hostname, local path, credential or unrelated service appears in public source/docs — checked across the full git history, not just the working tree.
+- [x] `npm test` (10/10) and `npm run verify:pins` green on the release commit.
+- [x] CI and the pinned central security gate green, with private filter terms loaded.
+- [x] Repository is public; annotated tag `v1.0.0` created on the release commit.
