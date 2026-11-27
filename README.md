@@ -136,8 +136,11 @@ are written to `results/<mode>-<timestamp>.json` and `.md`.
 - **Schema honesty was tested, not asserted.** The first local run failed Arm B
   because the bridge snapshot exposed control values but not the `taxable`
   domain fact, so the agent "fixed" two legitimate non-taxable zero rows. The
-  contract arm's typed state exposed `taxable` directly. See `RESULTS.md` §
-  "Schema honesty" for the trace and the required caveats.
+  contract arm's typed state exposed `taxable` directly. This is a structural
+  class of bug — any presentation-derived context requires the app to mirror
+  domain facts manually — and the independent beta.1 testing found related
+  agent/app disagreements. See `RESULTS.md` § "Schema honesty" for the trace,
+  the mechanism, and the required caveats.
 - Provider latency (the model call only) is recorded separately from wall
   clock (which includes browser setup). They are different numbers.
 - Arm C has no presentation layer. That is the independent variable.

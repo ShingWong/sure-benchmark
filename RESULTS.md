@@ -157,11 +157,32 @@ schema-honesty advantage — the agent sees what the data *is*, not what the UI
 happens to render — and it showed up as a correctness failure, not a token
 difference.
 
-**Caveats, required when quoting this:** it is one model, one task, three
-trials; the bridge could expose the same field from the start (ours initially
-did not); and the contract arm has no presentation layer by design. This is a
-demonstrated failure mode and a structural argument, **not** a general accuracy
-claim.
+### Why this is a class of bug, not a one-off
+
+The mechanism generalises. A component bridge hands the agent a
+**presentation-derived projection** — labels, values, actions, row text. Any
+domain fact the app does not explicitly mirror into that projection is
+invisible to the agent, even though the app itself knows it. The agent then
+reconstructs the missing fact from a superficial signal; here, "zero tax rate
+means faulty." The same shape of failure appears in the independent beta.1
+testing cited in §Sources: a cancelled change still returned success, and an
+action name accepted by `act()` was absent from `snapshot()`. Those are also
+agent/app disagreements caused by a projection that does not carry the full
+contract.
+
+`sure-state` removes this class **inside the contract surface** by construction:
+the agent reads typed entity state from the authoritative store, including
+`taxable`, `tax_rate` and `version`. There is no second presentation-layer
+schema for an app author to keep in sync, and version fences prevent acting on
+a stale projection. This is a structural win, not a lucky correct answer.
+
+**Caveats, required when quoting this:** we did not survey other projects, so
+we do not claim a frequency ("almost every project"). We claim a mechanism,
+one directly observed instance, and independent corroboration of related
+agent/app disagreements. A bridge *can* surface the same facts if the app
+chooses to. The contract surface can still be misread or be badly designed —
+it eliminates this *class* of omission bug, not all agent errors. One model,
+one task, three trials; no general accuracy claim.
 
 ### Limits
 
