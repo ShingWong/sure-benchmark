@@ -1,0 +1,36 @@
+{
+  "name": "sure-benchmark",
+  "version": "0.0.0-scaffold",
+  "private": true,
+  "description": "Reproducible agent-architecture benchmark for the sure stack — measures, never estimates.",
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "selftest": "node scripts/bench.mjs --mode=selftest",
+    "bench": "node scripts/bench.mjs",
+    "test": "node --test test/*.test.mjs",
+    "verify:pins": "node scripts/verify-pins.mjs"
+  },
+  "dependencies": {
+    "@shing.wong/sure-factor": "0.6.2",
+    "@shing.wong/sure-gentic": "0.1.2",
+    "@shing.wong/sure-state": "0.1.10",
+    "@shing.wong/sure-ui": "0.3.7"
+  },
+  "optionalDependencies": {
+    "@ui-sdk/core": "0.1.0-beta.1",
+    "@ui-sdk/react": "0.1.0-beta.1",
+    "playwright": "1.62.0",
+    "react": "19.1.10",
+    "react-dom": "19.1.10"
+  },
+  "keywords": [
+    "benchmark",
+    "agents",
+    "sure-stack",
+    "state-machine"
+  ]
+}

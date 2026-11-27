@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "fixture": true,
+  "description": "Entirely fictional billing reconciliation ledger. No real customer, invoice, PHI or secret.",
+  "invoice_id": "INV-2026-8842",
+  "customer_id": "CUST-8842",
+  "version": 104,
+  "currency": "USD",
+  "line_items": [
+    { "id": "LI-9901", "description": "Cloud Hosting Enterprise", "amount": 1250.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9902", "description": "Database Read Replicas", "amount": 450.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9903", "description": "Dedicated Compute Node", "amount": 800.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9904", "description": "Object Storage - Hot Tier", "amount": 310.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9905", "description": "CDN Egress Bandwidth", "amount": 920.50, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9906", "description": "Support Plan - Platinum", "amount": 1500.00, "taxable": false, "tax_rate": 0.0000 },
+    { "id": "LI-9907", "description": "K8s Control Plane Fee", "amount": 144.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9908", "description": "Log Analytics Ingestion", "amount": 670.25, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9909", "description": "Secrets Manager API Calls", "amount": 45.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9910", "description": "Edge Worker Executions", "amount": 210.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9911", "description": "VPC Peering Connection", "amount": 180.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9912", "description": "WAF Managed Ruleset", "amount": 350.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9913", "description": "Backup Storage Retain", "amount": 520.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9914", "description": "Container Registry Storage", "amount": 290.00, "taxable": true, "tax_rate": 0.0000 },
+    { "id": "LI-9915", "description": "Telemetry Pipeline Stream", "amount": 610.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9916", "description": "SSO Directory Integration", "amount": 400.00, "taxable": false, "tax_rate": 0.0000 },
+    { "id": "LI-9917", "description": "DNS Query Routing", "amount": 85.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9918", "description": "Vulnerability Scanner", "amount": 750.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9919", "description": "API Gateway Requests", "amount": 330.00, "taxable": true, "tax_rate": 0.0825 },
+    { "id": "LI-9920", "description": "Audit Trail Archival", "amount": 115.00, "taxable": true, "tax_rate": 0.0825 }
+  ]
+}

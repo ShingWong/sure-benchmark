@@ -1,0 +1,11 @@
+You are an autonomous validation and submission agent. Your objective is to load the billing reconciliation form, verify field states, resolve one validation mismatch, and submit the payload.
+
+Execution Requirements:
+1. Identify the form entity for Customer ID: "CUST-8842".
+2. Read the line items table and detect the mismatched row where tax_rate is missing or 0.00 while taxable is true.
+3. Update that specific line item with tax_rate = 0.0825.
+4. Assert the calculated subtotal and total balance match the sum of items + tax.
+5. Apply the mutation with an optimistic version fence (version = current_version).
+6. Dispatch the final submission and confirm status returns "COMMITTED".
+
+Log your step count, cumulative prompt tokens sent, completion tokens generated, and wall-clock execution time.

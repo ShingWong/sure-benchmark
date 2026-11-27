@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harness:
+    name: harness and pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install pinned dependencies
+        run: npm ci
+      - name: Hermetic harness tests
+        run: npm test
+      - name: Verify exact-version pins
+        run: npm run verify:pins
+      - name: Build Arm A
+        run: npm ci && npm run build
+        working-directory: arms/dom
+      - name: Build Arm B
+        run: npm ci && npm run build
+        working-directory: arms/ui-sdk
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start local benchmark server
+        run: node arms/server.mjs &
+      - name: End-to-end self-test of all three arms
+        run: npm run selftest -- --arm=all --trials=1
+      - name: Real sure-state adapter self-test
+        run: npm run selftest -- --arm=sure-state --adapter=sure-state --trials=1
+      - name: Upload self-test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-results
+          path: results/
+          if-no-files-found: ignore

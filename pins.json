@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-11-27",
+  "policy": "Exact versions only. No carets, no ranges, no floating tags. Every result file records the SHA-256 of this file, so a number can never be quoted without knowing what produced it.",
+  "packages": {
+    "@shing.wong/sure-state": {
+      "version": "0.1.10",
+      "kind": "arm-c-runtime",
+      "source": "https://www.npmjs.com/package/@shing.wong/sure-state"
+    },
+    "@shing.wong/sure-factor": {
+      "version": "0.6.2",
+      "kind": "arm-c-generation",
+      "source": "https://www.npmjs.com/package/@shing.wong/sure-factor"
+    },
+    "@shing.wong/sure-gentic": {
+      "version": "0.1.2",
+      "kind": "provider",
+      "source": "https://www.npmjs.com/package/@shing.wong/sure-gentic"
+    },
+    "@shing.wong/sure-ui": {
+      "version": "0.3.7",
+      "kind": "presentation",
+      "source": "https://www.npmjs.com/package/@shing.wong/sure-ui"
+    },
+    "@shing.wong/sure-web-testing": {
+      "version": "0.2.0",
+      "kind": "python",
+      "source": "pip install @shing-wong-sure-web-testing==0.2.0 (see project README)"
+    },
+    "@ui-sdk/core": {
+      "version": "0.1.0-beta.1",
+      "kind": "arm-b",
+      "source": "https://github.com/vercel-labs/ui"
+    },
+    "@ui-sdk/react": {
+      "version": "0.1.0-beta.1",
+      "kind": "arm-b",
+      "source": "https://github.com/vercel-labs/ui"
+    },
+    "react": {
+      "version": "19.1.10",
+      "kind": "arm-b-peer",
+      "source": "https://www.npmjs.com/package/react"
+    },
+    "react-dom": {
+      "version": "19.1.10",
+      "kind": "arm-b-peer",
+      "source": "https://www.npmjs.com/package/react-dom"
+    },
+    "vite": {
+      "version": "7.1.9",
+      "kind": "build-tool",
+      "source": "https://www.npmjs.com/package/vite"
+    },
+    "playwright": {
+      "version": "1.62.0",
+      "kind": "arm-a-browser",
+      "source": "https://www.npmjs.com/package/playwright"
+    },
+    "node": {
+      "version": "22",
+      "kind": "runtime",
+      "source": "https://nodejs.org"
+    }
+  },
+  "sources": [
+    {
+      "id": "vercel-launch",
+      "type": "primary",
+      "date": "2026-11-12",
+      "title": "Introducing UI SDK: 50+ Interface Behaviors for AI Coding Agents",
+      "url": "https://github.com/vercel-labs/ui/blob/main/apps/docs/content/docs/core/changelog/introducing-ui-sdk.mdx"
+    },
+    {
+      "id": "vercel-benchmark",
+      "type": "primary",
+      "date": "2026-11-12",
+      "title": "Built for Agents: The Agent Bridge Benchmark",
+      "url": "https://ui-sdk.dev/docs/agents"
+    },
+    {
+      "id": "marktechpost",
+      "type": "secondary",
+      "date": "2026-11-13",
+      "title": "Vercel Releases UI SDK: 50+ UI Behaviors for AI Coding Agents",
+      "url": "https://www.marktechpost.com/2026/11/13/vercel-ui-sdk-agent-ui-behaviors/"
+    },
+    {
+      "id": "dhar-verification",
+      "type": "independent",
+      "date": "2026-11-12",
+      "title": "Vercel UI SDK tested: allow, confirm and secret checks",
+      "url": "https://www.kartikaydhar.com/blog/vercel-ui-sdk-agent-bridge-tested"
+    }
+  ],
+  "externalFiguresNote": "The 5 vs 16 tool calls and 83% characters-read figures are attributed launch-day results from the sources above. They are context, not measurements produced by this project."
+}
