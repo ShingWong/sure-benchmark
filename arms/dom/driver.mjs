@@ -28,8 +28,13 @@ export async function createDomArm() {
       // observation, otherwise the agent sees a stale value and retries.
       const before = await page.evaluate(() => window.__bench.getState()?.version)
       if (call.type === 'fill') {
-        await page.fill(call.selector, call.value)
-        await page.waitForFunction((v) => window.__bench.getState()?.version > v, before)
+        // A repeated identical fill is a no-op in a real browser too. Without
+        // this guard a model that re-applies the correction hangs for 30s.
+        const current = await page.inputValue(call.selector)
+        if (String(current) !== String(call.value)) {
+          await page.fill(call.selector, call.value)
+          await page.waitForFunction((v) => window.__bench.getState()?.version > v, before)
+        }
       } else if (call.type === 'click') {
         await page.click(call.selector)
         await page.waitForFunction(() => window.__bench.getState()?.status === 'COMMITTED')

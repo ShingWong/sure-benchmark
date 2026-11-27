@@ -4,27 +4,28 @@
 /** Per-arm call shapes shared by every measured provider adapter. */
 export const TOOL_CONTRACT = {
   'contract:reference-contract':
-    'If any line_item has taxable=true AND tax_rate=0, call {"call":{"name":"updateTaxRate","args":{"id":"<that id>","tax_rate":0.0825,"version":<current version>}}}. Otherwise call {"call":{"name":"submit","args":{"version":<current version>}}}.',
+    'Inspect the contract state. If any line_item has taxable=true AND tax_rate=0, call {"call":{"name":"updateTaxRate","args":{"id":"<that id>","tax_rate":0.0825,"version":<current version>}}}. If no taxable item has tax_rate 0, call {"call":{"name":"submit","args":{"version":<current version>}}}.',
   'contract:sure-state':
-    'If any line_item has taxable=true AND tax_rate=0, call {"call":{"name":"updateTaxRate","args":{"id":"<that id>","tax_rate":0.0825,"version":<current version>}}}. Otherwise call {"call":{"name":"submit","args":{"version":<current version>}}}.',
+    'Inspect the contract state. If any line_item has taxable=true AND tax_rate=0, call {"call":{"name":"updateTaxRate","args":{"id":"<that id>","tax_rate":0.0825,"version":<current version>}}}. If no taxable item has tax_rate 0, call {"call":{"name":"submit","args":{"version":<current version>}}}.',
   'dom:react-aria-snapshot':
-    'If any taxable row still shows tax rate 0, fill its tax-rate input with 0.0825: {"call":{"type":"fill","selector":"<that input selector>","value":"0.0825"}}. Otherwise click submit: {"call":{"type":"click","selector":"#submit-btn"}}.',
+    'The context is an ARIA snapshot. Each row shows its tax rate as TEXT (tax-rate-value-<id>) and as a spinbutton. Look at the row for LI-9914. If its tax rate text is "0", fill its spinbutton: {"call":{"type":"fill","selector":"[aria-label=\\"tax-rate-LI-9914\\"]","value":"0.0825"}}. If its tax rate text is already "0.0825", IMMEDIATELY click submit: {"call":{"type":"click","selector":"#submit-btn"}}. Ignore other rows — non-taxable rows legitimately show 0.',
   'ui-sdk:agent-bridge':
-    'If any taxable row still shows tax rate 0, set it: {"call":{"steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}],"intent":"update"}}. Otherwise press submit: {"call":{"steps":[{"ref":"Submit reconciliation","action":"press"}],"intent":"submit"}}.',
+    'The context is a component snapshot. If a taxable row still has value "0", set it: {"call":{"steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}],"intent":"update"}}. If no taxable row has value "0", press submit: {"call":{"steps":[{"ref":"Submit reconciliation","action":"press"}],"intent":"submit"}}.',
   'ui-sdk:agent-bridge-query':
-    'First use {"call":{"tool":"query","input":{"text":"<row id>"}}}. Then, if the row still shows tax rate 0, use {"call":{"tool":"act","steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}]}}. When no taxable row has tax rate 0, use {"call":{"tool":"act","steps":[{"ref":"Submit reconciliation","action":"press"}]}}.',
+    'First use {"call":{"tool":"query","input":{"text":"<row id>"}}}. If the returned row still has value "0", use {"call":{"tool":"act","steps":[{"ref":"<that row label>","action":"setValue","args":["0.0825"]}]}}. When no taxable row has value "0", use {"call":{"tool":"act","steps":[{"ref":"Submit reconciliation","action":"press"}]}}.',
 }
 
 /**
- * Without this, a small model will happily re-apply the same correction every
- * turn, bump the version each time, and fail the shared verifier. The first
- * measured smoke run did exactly that (10 turns, version 104 → 113).
+ * A small model will otherwise re-apply the single correction every turn and
+ * fail the shared verifier. The first measured smoke did exactly that
+ * (10 turns, version 104 → 113). The DOM arm did the same thing and hit a
+ * driver timeout; the driver now treats an identical fill as a no-op.
  */
 export const STOP_CONDITION = [
-  'STOP CONDITION: read the current state in the context before acting.',
-  'If LI-9914 already has tax_rate 0.0825, do NOT call the update again —',
-  'your NEXT call must be the submit action (single mutation rule).',
-  'Only one update is permitted in the whole task.',
+  'STOP CONDITION: read the current context before every call.',
+  'If the field or line_item for LI-9914 ALREADY shows 0.0825,',
+  'do NOT repeat the update — your NEXT call MUST be the submit action.',
+  'Exactly one update is permitted in the whole task.',
 ].join(' ')
 
 export function buildSystemPrompt({ prompt, armName }) {

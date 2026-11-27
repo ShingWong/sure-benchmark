@@ -64,9 +64,14 @@ function App() {
             <tr key={row.id} data-row-id={row.id}>
               <td>{row.id}</td><td>{row.description}</td>
               <td>${row.amount.toFixed(2)}</td><td>{row.taxable ? 'TRUE' : 'FALSE'}</td>
-              <td><input type="number" step="0.0001" value={row.tax_rate}
-                aria-label={`tax-rate-${row.id}`}
-                onChange={(e) => changeTax(row.id, e.target.value)} /></td>
+              <td>
+                <span className="tax-rate-value" aria-label={`tax-rate-value-${row.id}`}>
+                  {row.tax_rate}
+                </span>
+                <input type="number" step="0.0001" value={row.tax_rate}
+                  aria-label={`tax-rate-${row.id}`}
+                  onChange={(e) => changeTax(row.id, e.target.value)} />
+              </td>
             </tr>
           ))}
         </tbody>
